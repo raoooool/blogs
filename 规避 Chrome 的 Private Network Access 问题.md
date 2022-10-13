@@ -1,8 +1,8 @@
 ## 为什么会出现
 
-google 在 `Chrome 94` 版本之后开始引入` PNA（Private Network Access）` 规范：禁止请求在不安全的环境（非 https）下，从公网资源访问私网资源，主要是为了防止 csrf 攻击。
+Google 在 `Chrome 94` 版本之后开始引入 `PNA（Private Network Access）` 规范：禁止请求在不安全的环境（非 https）下，从公网资源访问私网资源，主要是为了防止 CSRF 攻击。
 
-也就是说在一次请求中，就算目标资源配置了 cors 头，但只要符合 PNA 规范，Chrome 就会判定为是一次 PNA 请求，从而产生跨域错误。
+也就是说在一次请求中，就算目标资源配置了 CORS 头，但只要符合 PNA 规范，Chrome 就会判定为是一次 PNA 请求，从而产生跨域错误。
 
 ## 什么时候会出现
 
