@@ -117,9 +117,15 @@ yarn cypress open
 
 通过 `istanbul` babel 插件打包出含有覆盖率计数代码的包，再运行一次 cypress 测试，即可得到测试覆盖率文件 .nycout 和相对应的覆盖率文件，这时候我们可以选择通过直接打开 html 文件，可以很直观地看到覆盖率和**代码覆盖范围**，适合开发的时候使用；在命令行中，调用 yarn nyc report 可以直接在控制台得到覆盖率结果，方便在 ci 环境下使用。
 
+[![xHOky6.md.png](https://s1.ax1x.com/2022/11/02/xHOky6.md.png)](https://imgse.com/i/xHOky6)
+
 #### 开发流程
 
-因为 TDD 流程大家都还不太熟悉，建议直接开始写组件，然后再写测试用例。组件库会在提交推送（git push）的时候跑一遍测试，用例全部通过才允许提交。因为 vscode git 管理的一些原因，目前支持命令行内输入 git push 提交到远程仓库。
+因为 TDD 流程团队内部都还没达成共识，建议直接开始写组件，然后再写测试用例。测试用例统一放在组件文件夹下的 `__test__` 文件夹中，以 `组件名.ct.tsx` 格式命名。
+
+在大部分时候，完善组件的 Demo，在通过引入 Demo 组件的形式进行快照测试是比较好的选择，具体可以参考 `Layout` 组件的例子。
+
+组件库会在提交推送（push）的时候跑一遍测试，用例全部通过才允许提交。因为 vscode git 管理的一些原因，目前只能支持命令行内输入 `git push` 提交到远程仓库。
 
 ![](https://tva1.sinaimg.cn/large/008vxvgGgy1h7ksqx45cvj315n09lq4a.jpg)
 
