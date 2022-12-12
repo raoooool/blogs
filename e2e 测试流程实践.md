@@ -35,7 +35,46 @@ CYPRESS_INSTALL_BINARY=https://registry.npmmirror.com/-/binary/cypress/10.9.0/da
 
 ### Web 前端应用
 
-这里以超能云平台 Web 端举例。首先，官方文档里也有提到，完整类型的 Web 应用自动化测试有很大一部分工作在登录页面。
+这里以超能云平台 Web 端举例。
+
+#### 准备工作
+
+首先，官方文档里也有提到，完整类型的 Web 应用自动化测试有很大一部分工作在登录页面，但按照测试哲学来说，登录流程自然有登录流程的测试用例，在平常的测试中我们只需要把 token 提前通过环境变量的方式配置好即可：
+
+```js
+// cypress.env.json
+{
+    "baseUrl": "http://campus-local.test.seewo.com:4600",
+    "x-auth-token": "1331802eef6f4071aaf3383fbe011d9e"
+}
+```
+
+每个测试开始前把 token 和一切公共信息设置好：
+
+```js
+beforeEach(() => {
+  cy.setCookie("x-auth-token", Cypress.env("x-auth-token"));
+  cy.setCookie("x-unit-id", "46e710df868a4a07b25e68b0f17333a3"); // 计算机测试学院
+});
+```
+
+#### 开发流程
+
+首先，快照测试其实对 Web 应用来说意义不大。主要是因为 Web 应用的数据和画面变化非常频繁。
+
+并且，要以渐进式添加测试用例的方式推进老项目的测试覆盖率。
+
+基于以上两点考虑，开发流程建议如下：
+
+![](https://tva1.sinaimg.cn/large/008vxvgGgy1h8zxlsgzdrj31g80f6wfk.jpg)
+
+整个 Web 应用开发工作流中，有三个地方需要编写测试用例：
+
+1. 应用首次编写时，通过测试同学提供的自测点编写测试用例
+2. 测试同学提交 bug 反馈后，通过 bug 的描述编写测试用例
+3. 重构模块后，根据重构内容适当修改原有用例
+
+而运行测试用例的时机就很简单了：pre-push 的时候实际就应该确保测试通过。
 
 ### 组件库
 
@@ -129,14 +168,58 @@ yarn cypress open
 
 ![](https://tva1.sinaimg.cn/large/008vxvgGgy1h7ksqx45cvj315n09lq4a.jpg)
 
-## 踩坑
+#### 踩坑
 
-### 1. 组件测试基座需要设置为 1280 \* 720
+##### 1. 组件测试基座需要设置为 1280 \* 720
 
 cypress run versus cypress open is not same，因为 headless 测试的时候通过 `Xvfb` 进行无界面自动化测试，最大限制为 1280 \* 720。
 
-### 2. Vscode git pre-push 问题频出
+##### 2. Vscode git pre-push 问题频出
 
 Vscode git 模块默认日志输出 stderr，如果需要查看 pre-push 的打印内容需要在项目 vscode 配置中加上 `"git.commandsToLog": ["push"]`，vscode 才会输出 stdout。
 
 待解决的问题：通过 vscode git 工具推送到远程仓库会报无法找到 cypress app 的错误。
+
+### Cli 测试
+
+这里以 fman 为例。
+
+cli 的 e2e 测试就想对比较简单了，因为没有这么多复杂的界面。其实 cli 之类的基础工具可能更适合模块 / 函数的单元测试，但很多时候，e2e 测试也是很有必要的。
+
+#### 准备工作
+
+cli 的 e2e 测试使用比较流行的带有断言库测试框架即可，这里使用了 jest。
+
+```js
+// jest.config.js
+/** @type {import('ts-jest').JestConfigWithTsJest} */
+module.exports = {
+  preset: "ts-jest",
+  testEnvironment: "node",
+};
+```
+
+#### 开发流程
+
+cli e2e 测试的核心理念在于：
+
+1. 获取用户输入
+2. 执行操作
+3. 获取程序输出
+
+其中获取输入输出直接使用 node fs 模块自带的功能即可实现。比如：
+
+```js
+import { spawnSync } from "child_process";
+import paths from "./utils/paths";
+
+test("跑一手 fman", () => {
+  const resp = spawnSync("node", [paths.fman]);
+  const output = resp.output.toString();
+  expect(output).toContain("Commands:");
+});
+```
+
+## 成效
+
+待数据验证。
